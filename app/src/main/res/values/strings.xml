@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">AudioTest</string>
+    <string-array name="source_array">
+        <item>default</item>
+        <item>mic</item>
+        <item>unprocessed</item>
+        <item>voice communication</item>
+        <item>voice recognition</item>
+    </string-array>
 </resources>

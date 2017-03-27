@@ -16,20 +16,24 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import ca.uol.aig.fftpack.RealDoubleFFT;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
     int frequency =  8000;
     int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
     int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
     private RealDoubleFFT transformer;
     int blockSize = 320;
+    int source = MediaRecorder.AudioSource.DEFAULT;
 
     Button startStopButton;
     boolean started = false;
@@ -39,6 +43,8 @@ public class MainActivity extends Activity {
     EditText valRate;
     TextView lblSize;
     EditText valSize;
+    TextView lblSource;
+    Spinner valSource;
 
     RecordAudio recordTask;
 
@@ -78,11 +84,23 @@ public class MainActivity extends Activity {
         valRate = (EditText) findViewById(R.id.val_rate);
         lblSize = (TextView) findViewById(R.id.lbl_size);
         valSize = (EditText) findViewById(R.id.val_size);
+        lblSource = (TextView) findViewById(R.id.lbl_source);
+        valSource = (Spinner) findViewById(R.id.val_source);
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.source_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        valSource.setAdapter(adapter);
 
         lblRate.setVisibility(View.INVISIBLE);
         valRate.setVisibility(View.INVISIBLE);
         lblSize.setVisibility(View.INVISIBLE);
         valSize.setVisibility(View.INVISIBLE);
+        lblSource.setVisibility(View.INVISIBLE);
+        valSource.setVisibility(View.INVISIBLE);
 
         imageView = (ImageView) this.findViewById(R.id.imageView1);
         imageView.setVisibility(View.VISIBLE);
@@ -114,8 +132,11 @@ public class MainActivity extends Activity {
                         channelConfiguration, audioEncoding);
 
                 AudioRecord audioRecord = new AudioRecord(
-                        MediaRecorder.AudioSource.MIC, frequency,
-                        channelConfiguration, audioEncoding, bufferSize);
+                        source,
+                        frequency,
+                        channelConfiguration,
+                        audioEncoding,
+                        bufferSize);
 
                 short[] buffer = new short[blockSize];
                 double[] toTransform = new double[blockSize];
@@ -177,6 +198,8 @@ public class MainActivity extends Activity {
             valRate.setVisibility(View.INVISIBLE);
             lblSize.setVisibility(View.INVISIBLE);
             valSize.setVisibility(View.INVISIBLE);
+            lblSource.setVisibility(View.INVISIBLE);
+            valSource.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
 
             frequency = Integer.parseInt(valRate.getText().toString(), 10);
@@ -205,6 +228,8 @@ public class MainActivity extends Activity {
             valRate.setVisibility(View.INVISIBLE);
             lblSize.setVisibility(View.INVISIBLE);
             valSize.setVisibility(View.INVISIBLE);
+            lblSource.setVisibility(View.INVISIBLE);
+            valSource.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
             inConfig = false;
         } else {
@@ -217,6 +242,8 @@ public class MainActivity extends Activity {
             valRate.setVisibility(View.VISIBLE);
             lblSize.setVisibility(View.VISIBLE);
             valSize.setVisibility(View.VISIBLE);
+            lblSource.setVisibility(View.VISIBLE);
+            valSource.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.INVISIBLE);
             inConfig = true;
         }
@@ -227,4 +254,31 @@ public class MainActivity extends Activity {
         super.onPause();
         started = false;
     }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        switch (position) {
+            case 0:
+                source = MediaRecorder.AudioSource.DEFAULT;
+                break;
+            case 1:
+                source = MediaRecorder.AudioSource.MIC;
+                break;
+            case 2:
+                source = MediaRecorder.AudioSource.UNPROCESSED;
+                break;
+            case 3:
+                source = MediaRecorder.AudioSource.VOICE_COMMUNICATION;
+                break;
+            case 4:
+                source = MediaRecorder.AudioSource.VOICE_RECOGNITION;
+                break;
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
 }
