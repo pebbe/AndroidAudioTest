@@ -33,6 +33,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
     private RealDoubleFFT transformer;
     int blockSize = 320;
+    double emphasise = 0.25;
     int source = MediaRecorder.AudioSource.DEFAULT;
 
     Button startStopButton;
@@ -43,6 +44,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     EditText valRate;
     TextView lblSize;
     EditText valSize;
+    TextView lblEmph;
+    EditText valEmph;
     TextView lblSource;
     Spinner valSource;
 
@@ -84,6 +87,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         valRate = (EditText) findViewById(R.id.val_rate);
         lblSize = (TextView) findViewById(R.id.lbl_size);
         valSize = (EditText) findViewById(R.id.val_size);
+        lblEmph = (TextView) findViewById(R.id.lbl_emph);
+        valEmph = (EditText) findViewById(R.id.val_emph);
         lblSource = (TextView) findViewById(R.id.lbl_source);
         valSource = (Spinner) findViewById(R.id.val_source);
 
@@ -99,6 +104,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         valRate.setVisibility(View.INVISIBLE);
         lblSize.setVisibility(View.INVISIBLE);
         valSize.setVisibility(View.INVISIBLE);
+        lblEmph.setVisibility(View.INVISIBLE);
+        valEmph.setVisibility(View.INVISIBLE);
         lblSource.setVisibility(View.INVISIBLE);
         valSource.setVisibility(View.INVISIBLE);
 
@@ -176,7 +183,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
 
             for (int i = 0; i < toTransform[0].length; i++) {
                 int x = (800 * i) / blockSize;
-                int downy = (int) (800 - (toTransform[0][i] * m * Math.pow(i, .25)));
+                int downy = (int) (800 - (toTransform[0][i] * m * Math.pow(i, emphasise)));
                 int upy = 800;
 
                 canvas.drawLine(x, downy, x, upy, paint);
@@ -198,20 +205,43 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             valRate.setVisibility(View.INVISIBLE);
             lblSize.setVisibility(View.INVISIBLE);
             valSize.setVisibility(View.INVISIBLE);
+            lblEmph.setVisibility(View.INVISIBLE);
+            valEmph.setVisibility(View.INVISIBLE);
             lblSource.setVisibility(View.INVISIBLE);
             valSource.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
 
-            frequency = Integer.parseInt(valRate.getText().toString(), 10);
+            try {
+                frequency = Integer.parseInt(valRate.getText().toString(), 10);
+            } catch (Exception e) {
+                frequency = 8000;
+                valRate.setText(""+frequency);
+            }
             if (frequency < 2000 || frequency > 44100) {
                 frequency = 8000;
                 valRate.setText(""+frequency);
             }
 
-            blockSize = Integer.parseInt(valSize.getText().toString(), 10);
+            try {
+                blockSize = Integer.parseInt(valSize.getText().toString(), 10);
+            } catch (Exception e) {
+                blockSize = 320;
+                valSize.setText(""+blockSize);
+            }
             if (blockSize < 100 || blockSize > frequency) {
                 blockSize = 320;
                 valSize.setText(""+blockSize);
+            }
+
+            try {
+                emphasise = Float.parseFloat(valEmph.getText().toString());
+            } catch (Exception e) {
+                emphasise = 0.25;
+                valEmph.setText("0.25");
+            }
+            if (emphasise < 0 || emphasise > 1) {
+                emphasise = 0.25;
+                valEmph.setText("0.25");
             }
 
             started = true;
@@ -228,6 +258,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             valRate.setVisibility(View.INVISIBLE);
             lblSize.setVisibility(View.INVISIBLE);
             valSize.setVisibility(View.INVISIBLE);
+            lblEmph.setVisibility(View.INVISIBLE);
+            valEmph.setVisibility(View.INVISIBLE);
             lblSource.setVisibility(View.INVISIBLE);
             valSource.setVisibility(View.INVISIBLE);
             imageView.setVisibility(View.VISIBLE);
@@ -242,6 +274,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             valRate.setVisibility(View.VISIBLE);
             lblSize.setVisibility(View.VISIBLE);
             valSize.setVisibility(View.VISIBLE);
+            lblEmph.setVisibility(View.VISIBLE);
+            valEmph.setVisibility(View.VISIBLE);
             lblSource.setVisibility(View.VISIBLE);
             valSource.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.INVISIBLE);
